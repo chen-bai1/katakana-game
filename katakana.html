@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>五十音图片假名单人游戏</title>
+  <style>
+    :root{
+      --bg1:#fff7fb;
+      --bg2:#eef8ff;
+      --pink:#ff72b1;
+      --pink2:#ffc4dd;
+      --blue:#8fd2ff;
+      --yellow:#ffe07b;
+      --green:#8ae0b8;
+      --text:#5f5368;
+      --card:#ffffffee;
+      --shadow:0 0.8rem 1.5rem rgba(255,114,177,.16);
+      --radius:1.2rem;
+      --btn-shadow:0 0.45rem 0.8rem rgba(0,0,0,.08);
+    }
+
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body{
+      margin:0;
+      font-family:"Hiragino Sans","Yu Gothic","PingFang SC","Microsoft YaHei",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 12% 15%, #ffe4f1 0 10%, transparent 11%),
+        radial-gradient(circle at 88% 18%, #def4ff 0 10%, transparent 11%),
+        radial-gradient(circle at 20% 85%, #fff3bc 0 9%, transparent 10%),
+        radial-gradient(circle at 82% 82%, #e4ffec 0 9%, transparent 10%),
+        linear-gradient(135deg,var(--bg1),var(--bg2));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:480px;
+      margin:0 auto;
+      padding:3vw;
+    }
+
+    .title{
+      text-align:center;
+      font-weight:900;
+      font-size:clamp(1.6rem, 6vw, 2.2rem);
+      color:#ff5fa0;
+      margin:2vw 0 1.5vw;
+      text-shadow:0.12rem 0.12rem 0 #fff;
+      line-height:1.25;
+    }
+
+    .subtitle{
+      text-align:center;
+      color:#7d7287;
+      font-size:clamp(0.92rem, 3.5vw, 1rem);
+      margin-bottom:3vw;
+      line-height:1.6;
+    }
+
+    .panel{
+      background:var(--card);
+      border:0.18rem solid #fff;
+      border-radius:1.4rem;
+      box-shadow:var(--shadow);
+      padding:3.5vw;
+      margin-bottom:3vw;
+      backdrop-filter: blur(0.4rem);
+    }
+
+    .top-info{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:3vw;
+      margin-bottom:3vw;
+    }
+
+    .info-card{
+      background:linear-gradient(180deg,#fff,#fff7fb);
+      border-radius:1.1rem;
+      padding:3.5vw 2vw;
+      text-align:center;
+      box-shadow:0 0.35rem 0.8rem rgba(0,0,0,.05);
+      border:0.16rem solid #fff;
+    }
+
+    .info-title{
+      font-size:0.96rem;
+      font-weight:800;
+      color:#7e7287;
+      margin-bottom:1.2vw;
+    }
+
+    .info-value{
+      font-size:clamp(1.4rem, 6vw, 2rem);
+      font-weight:900;
+      line-height:1.1;
+    }
+
+    .score-value{ color:#ff5fa0; }
+    .time-value{ color:#5e7cff; }
+
+    .status-box{
+      background:linear-gradient(180deg,#fffdf8,#fff);
+      border-radius:1rem;
+      padding:3.2vw;
+      text-align:center;
+      border:0.16rem dashed #ffd996;
+      margin-bottom:3vw;
+      min-height:4.5rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:clamp(0.98rem, 3.8vw, 1.08rem);
+      font-weight:800;
+      color:#6b6178;
+      line-height:1.6;
+    }
+
+    .controls{
+      display:flex;
+      justify-content:center;
+      gap:3vw;
+      flex-wrap:wrap;
+    }
+
+    .ctrl-btn{
+      border:none;
+      border-radius:999px;
+      padding:0.9rem 1.3rem;
+      font-size:1rem;
+      font-weight:900;
+      color:#fff;
+      cursor:pointer;
+      box-shadow:var(--btn-shadow);
+      transition:transform .15s ease;
+      min-width:7.2rem;
+    }
+
+    .ctrl-btn:active{
+      transform:scale(.96);
+    }
+
+    .start-btn{
+      background:linear-gradient(135deg,#ff78af,#ff5f8f);
+    }
+
+    .reset-btn{
+      background:linear-gradient(135deg,#7fcfff,#4ea9ff);
+    }
+
+    .section-title{
+      font-size:1.1rem;
+      font-weight:900;
+      color:#6d6279;
+      margin-bottom:2.6vw;
+      text-align:center;
+    }
+
+    .kana-grid{
+      display:grid;
+      grid-template-columns:repeat(5, 1fr);
+      gap:2.2vw;
+    }
+
+    .kana-btn{
+      aspect-ratio:1 / 1;
+      border:none;
+      border-radius:1rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:clamp(1.2rem, 6vw, 1.8rem);
+      font-weight:900;
+      cursor:pointer;
+      color:#5e5068;
+      border:0.16rem solid #fff;
+      box-shadow:0 0.4rem 0.75rem rgba(255,114,177,.12);
+      background:linear-gradient(180deg,#ffffff,#fff2f8);
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+      user-select:none;
+    }
+
+    .kana-btn:active{
+      transform:scale(.95);
+    }
+
+    .kana-btn.done{
+      background:linear-gradient(180deg,#fff8cf,#ffe89c);
+      color:#7a5a00;
+      box-shadow:0 0.35rem 0.7rem rgba(255,215,106,.22);
+    }
+
+    .result-box{
+      margin-top:3vw;
+      text-align:center;
+      font-size:clamp(1.1rem, 4.5vw, 1.35rem);
+      font-weight:900;
+      color:#ff5f8f;
+      line-height:1.7;
+      min-height:3.2rem;
+    }
+
+    .footer-note{
+      text-align:center;
+      margin-top:2vw;
+      color:#85798f;
+      font-size:0.9rem;
+      line-height:1.6;
+    }
+
+    @media (min-width:481px){
+      .wrap{
+        padding:14px;
+      }
+      .panel{
+        padding:16px;
+        margin-bottom:14px;
+      }
+      .top-info{
+        gap:12px;
+        margin-bottom:14px;
+      }
+      .info-card{
+        padding:14px 10px;
+      }
+      .status-box{
+        padding:14px;
+        margin-bottom:14px;
+      }
+      .controls{
+        gap:12px;
+      }
+      .kana-grid{
+        gap:10px;
+      }
+      .section-title{
+        margin-bottom:12px;
+      }
+      .result-box{
+        margin-top:14px;
+      }
+      .footer-note{
+        margin-top:10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">🎀 五十音图片假名单人游戏 🎀</div>
+    <div class="subtitle">按五十音顺序依次找出假名。选对加10分，选错扣10分。</div>
+
+    <div class="panel">
+      <div class="top-info">
+        <div class="info-card">
+          <div class="info-title">当前得分</div>
+          <div class="info-value score-value" id="scoreDisplay">0</div>
+        </div>
+        <div class="info-card">
+          <div class="info-title">已用时间</div>
+          <div class="info-value time-value" id="timeDisplay">00:00</div>
+        </div>
+      </div>
+
+      <div class="status-box" id="statusText">点击“开始游戏”后开始计时</div>
+
+      <div class="controls">
+        <button class="ctrl-btn start-btn" id="startBtn">开始游戏</button>
+        <button class="ctrl-btn reset-btn" id="resetBtn">重新开始</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">🎈 打乱的五十音图</div>
+      <div class="kana-grid" id="kanaGrid"></div>
+      <div class="result-box" id="resultBox"></div>
+    </div>
+  </div>
+
+  <script>
+    const kanaOrder = [
+      "ア","イ","ウ","エ","オ",
+      "カ","キ","ク","ケ","コ",
+      "サ","シ","ス","セ","ソ",
+      "タ","チ","ツ","テ","ト",
+      "ナ","ニ","ヌ","ネ","ノ",
+      "ハ","ヒ","フ","ヘ","ホ",
+      "マ","ミ","ム","メ","モ",
+      "ヤ","ユ","ヨ",
+      "ラ","リ","ル","レ","ロ",
+      "ワ","ヲ","ン"
+    ];
+
+    let shuffledKana = [];
+    let doneKana = [];
+    let currentIndex = 0;
+    let score = 0;
+    let gameStarted = false;
+    let gameEnded = false;
+    let startTime = null;
+    let timerInterval = null;
+
+    const kanaGrid = document.getElementById("kanaGrid");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const timeDisplay = document.getElementById("timeDisplay");
+    const statusText = document.getElementById("statusText");
+    const resultBox = document.getElementById("resultBox");
+    const startBtn = document.getElementById("startBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    function shuffle(array){
+      const arr = [...array];
+      for(let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function formatTime(ms){
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+      const seconds = String(totalSeconds % 60).padStart(2, "0");
+      return `${minutes}:${seconds}`;
+    }
+
+    function updateTime(){
+      if(!gameStarted || gameEnded || !startTime) return;
+      const now = Date.now();
+      timeDisplay.textContent = formatTime(now - startTime);
+    }
+
+    function startTimer(){
+      clearInterval(timerInterval);
+      startTime = Date.now();
+      timeDisplay.textContent = "00:00";
+      timerInterval = setInterval(updateTime, 200);
+    }
+
+    function stopTimer(){
+      clearInterval(timerInterval);
+      timerInterval = null;
+      updateTime();
+    }
+
+    function updateScore(){
+      scoreDisplay.textContent = score;
+    }
+
+    function getDisplayOrder(){
+      const remaining = shuffledKana.filter(k => !doneKana.includes(k));
+      return [...doneKana, ...remaining];
+    }
+
+    function renderGrid(){
+      kanaGrid.innerHTML = "";
+      const displayOrder = getDisplayOrder();
+
+      displayOrder.forEach(kana => {
+        const btn = document.createElement("button");
+        btn.className = "kana-btn";
+        if(doneKana.includes(kana)){
+          btn.classList.add("done");
+        }
+        btn.textContent = kana;
+        btn.dataset.kana = kana;
+        btn.addEventListener("click", () => handleKanaClick(kana));
+        kanaGrid.appendChild(btn);
+      });
+    }
+
+    function speakKana(kana){
+      try{
+        const utter = new SpeechSynthesisUtterance(kana);
+        utter.lang = "ja-JP";
+        utter.rate = 0.9;
+        utter.pitch = 1.05;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utter);
+      }catch(e){
+        console.log("语音播放失败", e);
+      }
+    }
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function unlockAudio(){
+      if(audioCtx.state === "suspended"){
+        audioCtx.resume();
+      }
+    }
+
+    function tone(freq = 440, duration = 0.12, type = "sine", volume = 0.05){
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.value = volume;
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playCorrectSound(){
+      tone(523, 0.1, "triangle", 0.05);
+      setTimeout(() => tone(659, 0.1, "triangle", 0.05), 100);
+      setTimeout(() => tone(784, 0.16, "triangle", 0.055), 200);
+    }
+
+    function playWrongSound(){
+      tone(260, 0.12, "sawtooth", 0.05);
+      setTimeout(() => tone(180, 0.16, "sawtooth", 0.05), 110);
+    }
+
+    function handleKanaClick(kana){
+      if(!gameStarted || gameEnded) return;
+
+      unlockAudio();
+      speakKana(kana);
+
+      const expectedKana = kanaOrder[currentIndex];
+
+      if(kana === expectedKana){
+        playCorrectSound();
+        score += 10;
+        doneKana.push(kana);
+        currentIndex++;
+        updateScore();
+        renderGrid();
+
+        if(currentIndex >= kanaOrder.length){
+          endGame();
+          return;
+        }
+
+        statusText.textContent = `✅ 正确！+10分。继续找下一个假名。`;
+      }else{
+        playWrongSound();
+        score -= 10;
+        updateScore();
+        statusText.textContent = `❌ 选错了！-10分。请继续寻找正确假名。`;
+      }
+    }
+
+    function startGame(){
+      unlockAudio();
+      if(gameStarted && !gameEnded) return;
+
+      gameStarted = true;
+      gameEnded = false;
+      resultBox.textContent = "";
+      statusText.textContent = "🎯 游戏开始！请按五十音顺序点击假名。";
+      startTimer();
+    }
+
+    function endGame(){
+      gameEnded = true;
+      stopTimer();
+
+      const totalTime = timeDisplay.textContent;
+      statusText.textContent = "🎉 全部完成，太棒啦！";
+      resultBox.innerHTML = `完成用时：${totalTime}<br>最终得分：${score} 分`;
+    }
+
+    function initGame(){
+      stopTimer();
+      speechSynthesis.cancel();
+
+      shuffledKana = shuffle(kanaOrder);
+      doneKana = [];
+      currentIndex = 0;
+      score = 0;
+      gameStarted = false;
+      gameEnded = false;
+      startTime = null;
+
+      updateScore();
+      timeDisplay.textContent = "00:00";
+      statusText.textContent = "点击“开始游戏”后开始计时";
+      resultBox.textContent = "";
+      renderGrid();
+    }
+
+    startBtn.addEventListener("click", startGame);
+    resetBtn.addEventListener("click", initGame);
+
+    initGame();
+  </script>
+</body>
+</html>
